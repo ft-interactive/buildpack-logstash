@@ -1,28 +1,47 @@
 #!/bin/bash
 # bin/compile <build-dir> <cache-dir> <env-dir>
 
+function version_gt() { test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1"; }
+
 echo "_Compiling_ Logstash package"
 
 # parse args
 BUILD_DIR=$1
 CACHE_DIR=$2
 ENV_DIR=$3
+if [ -e $ENV_DIR/LOGSTASH_VERSION ]
+then
+    VERSION=$(cat $ENV_DIR/LOGSTASH_VERSION)
+else
+    VERSION="5.1.2"
+fi
+
+echo "Using Logstash version $VERSION"
 
 mkdir -p $CACHE_DIR
 
-LOGSTASH_URL=https://download.elastic.co/logstash/logstash/logstash-1.5.4.tar.gz
+if version_gt $VERSION "2.4.0"
+then
+  LOGSTASH_URL=https://artifacts.elastic.co/downloads/logstash/logstash-$VERSION.tar.gz
+else
+  LOGSTASH_URL=https://download.elastic.co/logstash/logstash/logstash-$VERSION.tar.gz
+fi
 
-
-if [[ -f "$CACHE_DIR/logstash-1.5.4.tar.gz" ]]; then
+if [[ -f "$CACHE_DIR/logstash-$VERSION.tar.gz" ]]; then
     echo "Logstash package already detected in cache, skipping download."
 else
     echo "Downloading Logstash into $CACHE_DIR ..."
-    curl --silent --location $LOGSTASH_URL -o $CACHE_DIR/logstash-1.4.2.tar.gz
+    curl --silent --location $LOGSTASH_URL -o $CACHE_DIR/logstash-$VERSION.tar.gz
     echo "...done."
 fi
 
-echo "Unpacking Logstash..."
-tar -xzf $CACHE_DIR/logstash-1.4.2.tar.gz -C $BUILD_DIR
-echo "...done."
 
-
+if [ -e $CACHE_DIR/logstash-$VERSION.tar.gz ]
+then
+    echo "Unpacking Logstash..."
+    mkdir $BUILD_DIR/logstash
+    tar -xzf $CACHE_DIR/logstash-$VERSION.tar.gz --strip 1 -C $BUILD_DIR/logstash
+    echo "...done."
+else
+    echo "Logstash archive not found; possibly an incorrect version?"
+fi
