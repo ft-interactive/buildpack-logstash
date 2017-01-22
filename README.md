@@ -9,16 +9,25 @@ To use:
 2. **Add the buildpack:**
 
   `$ heroku buildpacks:add https://github.com/ft-interactive/buildpack-logstash`
-3. Set LOGSTASH_VERSION config variable:
+3. **Set LOGSTASH_VERSION** config variable:
 
   `$ heroku config:add LOGSTASH_VERSION="2.4.0"`
 
-  The buildpack defaults to 5.1.2, which needs Java 8.
-  I don't know how to use Java 8 outside of Java projects on Heroku.
-  Don't use Logstash 5.1.2.
+  The buildpack defaults to 5.1.2, which needs Java 8. Heroku defaults to Java 7; to get 8, use the
+  `jvm-common` buildpack and put it at the front of your stack:
+
+  `$ heroku buildpacks:add -i 1 https://github.com/heroku/heroku-buildpack-jvm-common.git`
+
 4. Add Logstash to your Procfile:
 
+  `$ echo "logstash: logstash/bin/logstash -f logstash.conf" >> Procfile`
+
+  N.b., if using Logstash 2.4.0 (the latest non-5.x release), you may need to add modify this to:
+
   `$ echo "logstash: logstash/bin/logstash --allow-env -f logstash.conf" >> Procfile`
+
+  ...To allow environment variables in config files. If using ElasticSearch, you'll need to ensure
+  that the index is created before pushing data to it as well.
 5. Commit and push:
 
   `$ git add Procfile`
