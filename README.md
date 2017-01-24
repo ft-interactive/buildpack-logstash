@@ -42,9 +42,15 @@ To use:
 You should now be ingesting data via Logstash!
 Note that Logstash is kinda tempermental and you should really review your logs to ensure it's working.
 
-### Adding Logstash plugins:
+### ~~Adding Logstash plugins:~~
 
-This is optional. To set a list of Logstash plugins to install, supply an env var named LOGSTASH_PLUGINS
-with each item separated by semi-colon:
+** Note, this presently doesn't work because
+of some issue with how the Heroku slug compiler
+uses Ruby. If you need a custom plugin, I recommend installing it *post-build* by setting your Procfile as such: **
 
-`LOGSTASH_PLUGINS="logstash-output-slack;logstash-input-websocket"`
+`logstash: logstash/bin/logstash-plugin install logstash-output-slack; logstash/bin/logstash -f logstash.conf`
+
+~~This is optional. To set a list of Logstash plugins to install, supply an env var named LOGSTASH_PLUGINS
+with each item separated by semi-colon:~~
+
+~~`LOGSTASH_PLUGINS="logstash-output-slack;logstash-input-websocket"`~~
