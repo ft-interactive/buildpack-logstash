@@ -41,3 +41,10 @@ To use:
 
 You should now be ingesting data via Logstash!
 Note that Logstash is kinda tempermental and you should really review your logs to ensure it's working.
+
+### Adding Logstash plugins:
+
+This is optional. To set a list of Logstash plugins to install, supply an env var named LOGSTASH_PLUGINS
+with each item separated by semi-colon:
+
+`LOGSTASH_PLUGINS="logstash-output-slack;logstash-input-websocket"`

@@ -45,3 +45,15 @@ then
 else
     echo "Logstash archive not found; possibly an incorrect version?"
 fi
+
+if [ -e $ENV_DIR/LOGSTASH_PLUGINS ]
+then
+  PLUGIN_STRING=$(cat $ENV_DIR/LOGSTASH_PLUGINS)
+  echo "Installing plugins:"
+  while IFS=';' read -ra PLUGINS; do
+       for i in "${PLUGINS[@]}"; do
+          $BUILD_DIR/logstash/bin/logstash-plugin install $i
+          echo "* Added: $i"
+       done
+  done <<< "$PLUGIN_STRING"
+fi
